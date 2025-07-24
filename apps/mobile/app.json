@@ -1,8 +1,11 @@
 {
   "expo": {
-    "scheme": "acme",
+    "name": "licensePlate",
+    "version": "1.0.0",
+    "slug": "licensePlate",
+    "schema": "licensePlate",
     "userInterfaceStyle": "automatic",
-    "orientation": "default",
+    "orientation": "portrait",
     "web": {
       "output": "static"
     },
@@ -13,8 +16,6 @@
           "origin": "https://n"
         }
       ]
-    ],
-    "name": "licensePlate",
-    "slug": "licensePlate"
+    ]
   }
 }
