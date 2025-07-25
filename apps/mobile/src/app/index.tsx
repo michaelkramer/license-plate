@@ -1,6 +1,5 @@
-import { Link } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import StateList from "../component/StateList";
 import TrackedPlates from "../component/TrackedPlates";
 import { Footer } from "../component/layout/Footer";

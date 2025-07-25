@@ -1,17 +1,16 @@
-import { Request, Response, Router } from "express";
+import { Controller, Get, Route, Tags } from "tsoa";
+interface PingResponse {
+  message: string;
+}
 
-const server = Router();
-/**
- * @swagger
- * /ping:
- *   get:
- *     summary: Ping
- *     responses:
- *       200:
- *         description: Pong.
- */
-server.get("/ping", (_req: Request, res: Response) => {
-  res.status(200).send("Pong");
-});
-
-export default server;
+@Route("ping")
+@Tags("default")
+export class PingController extends Controller {
+  @Get()
+  public async pingHandler(): Promise<PingResponse> {
+    const message: PingResponse = {
+      message: "pong",
+    };
+    return message;
+  }
+}

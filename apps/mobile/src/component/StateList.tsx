@@ -2,7 +2,15 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { View, ScrollView, Pressable, Text } from "react-native";
 
-export default function StateList({ states, trackedPlates, handlePlateClick }) {
+export default function StateList({
+  states,
+  trackedPlates,
+  handlePlateClick,
+}: {
+  states: string[];
+  trackedPlates: string[];
+  handlePlateClick: (state: string) => void;
+}) {
   return (
     <View className="flex-1" id="states-list">
       <ScrollView contentContainerStyle={{ flexGrow: 1 }} style={{ flex: 1 }}>
