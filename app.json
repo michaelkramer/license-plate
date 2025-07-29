@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "1b025fdf-03f9-46ba-91b0-b3e5cffd3c0e"
+      }
+    },
+    "owner": "kramerica",
+    "slug": "license-plate"
+  }
+}

@@ -7,7 +7,7 @@ const doc = {
     description: "",
   },
   host: "localhost:3000", // Adjust host as needed
-  basePath: "/api",
+  basePath: "/api/v1",
   schemes: ["http"],
   // Add other Swagger definitions like security, tags, etc.
   definitions: {

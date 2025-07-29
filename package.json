@@ -8,7 +8,7 @@
     "ios": "npm run ios --workspace=licenseplate-mobile",
     "web": "npm run web --workspace=licenseplate-mobile",
     "deploy": "npm run deploy --workspace=licenseplate-mobile",
-    "swagger": "npm run swagger --workspace=licenseplate-server",
+    "build:docs": "npm run build:docs --workspace=licenseplate-server",
     "server": "npm run dev --workspace=licenseplate-server",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
@@ -31,5 +31,8 @@
     "prettier": "3.5.3",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.30.0"
+  },
+  "dependencies": {
+    "expo-camera": "~16.1.11"
   }
 }

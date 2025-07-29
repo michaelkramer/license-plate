@@ -12,6 +12,12 @@ export function Header() {
           License Plate Tracker Game
         </Link>
         <Link
+          href="/test-plates"
+          className="mt-2 text-blue-600 font-medium hover:underline"
+        >
+          test
+        </Link>
+        <Link
           href="/state-plates"
           className="mt-2 text-blue-600 font-medium hover:underline"
         >

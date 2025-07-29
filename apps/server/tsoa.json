@@ -4,9 +4,12 @@
   "controllerPathGlobs": ["./src/controllers/*.ts"],
   "spec": {
     "outputDirectory": "build",
-    "specVersion": 3
+    "specVersion": 3,
+    "basePath": "/api/v1"
   },
   "routes": {
-    "routesDir": "build"
+    "routesDir": "build",
+    "basePath": "/api/v1",
+    "middleware": "express"
   }
 }
