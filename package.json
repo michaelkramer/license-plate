@@ -33,6 +33,7 @@
     "typescript-eslint": "^8.30.0"
   },
   "dependencies": {
-    "expo-camera": "~16.1.11"
+    "expo-camera": "~16.1.11",
+    "expo-dev-client": "~5.2.4"
   }
 }
