@@ -12,12 +12,18 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EAS_BUILD_NO_EXPO_GO_WARNING": "true"
+      }
     }
   },
   "submit": {
     "production": {
-      "ios": {}
+      "ios": {
+        "ascAppId": "6772763761",
+        "appleTeamId": "3QHX4M4J4Q"
+      }
     }
   }
 }

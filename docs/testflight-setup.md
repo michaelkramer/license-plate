@@ -10,11 +10,34 @@ One-time steps before the [iOS TestFlight workflow](../.github/workflows/ios-tes
 
 ## Expo / EAS (local, once)
 
+CI builds are **non-interactive**. Apple signing credentials must already exist on Expo’s servers before GitHub Actions can succeed.
+
+### 1. Link App Store Connect API key on Expo (recommended)
+
+GitHub secrets alone are not enough for **creating** iOS certs the first time.
+
+1. Open [expo.dev](https://expo.dev) → **kramerica** → **license-plate** → **Project settings** → **Credentials** (or **App Store Connect API Key**).
+2. Upload the same API key you use for submit (`EXPO_ASC_API_KEY_ID`, issuer, `.p8`).
+
+### 2. Create iOS production credentials (interactive, on your Mac)
+
 ```sh
 cd apps/mobile
 npx eas-cli login
-npx eas-cli credentials   # iOS → production
+npx eas-cli credentials
 ```
+
+Choose **iOS** → **production** → **Distribution Certificate** / **Provisioning Profile** → let **EAS manage** them. Answer prompts with your Apple Developer login if asked.
+
+### 3. Confirm with one local production build
+
+Run **without** `--non-interactive` the first time so EAS can validate the distribution certificate:
+
+```sh
+npm run build:ios:prod
+```
+
+When that finishes on [expo.dev](https://expo.dev), CI non-interactive builds should work.
 
 Optional smoke build before enabling CI:
 
@@ -73,3 +96,40 @@ Replace placeholder icons in `apps/mobile/assets/` (`icon.png`, `splash-icon.png
 3. Merge to `main` with a change under `apps/mobile/` (not only `app.json`), or run **Actions → iOS TestFlight → Run workflow**.
 4. Confirm the workflow completes: build → submit → version sync commit with `[skip ci]`.
 5. Check TestFlight in App Store Connect after processing.
+
+## CI log messages explained
+
+| Message | Meaning |
+|---------|---------|
+| **Expo Go for development** warning | Informational. You are not shipping Expo Go; EAS is nudging you toward a dev client for local dev. Safe to ignore for TestFlight, or set `EAS_BUILD_NO_EXPO_GO_WARNING=true` on the build profile. |
+| **No environment variables for "production" on EAS** | EAS cloud env vars for the production environment are empty. Not an error unless you rely on `EXPO_PUBLIC_*` vars at build time. |
+| **Incrementing buildNumber** | Working as intended (`autoIncrement` in `eas.json`). |
+| **Distribution Certificate is not validated for non-interactive builds** / **Credentials are not set up** | **This fails the build.** Run the [Expo / EAS (local, once)](#expo--eas-local-once) steps above on your machine, then re-run GitHub Actions. |
+
+## Submit failed (“Something went wrong…”)
+
+The CLI message is generic. Find the real error:
+
+1. Open the submission log on Expo (from your terminal):  
+   `https://expo.dev/accounts/kramerica/projects/license-plate/submissions/<submission-id>`
+2. Or re-run with verbose logging (use your build ID from the successful build):
+
+   ```sh
+   cd apps/mobile
+   npx eas-cli submit --platform ios --id c191d03d-1a14-4d16-975d-dd300ea41e5a --profile production --verbose --verbose-fastlane
+   ```
+
+3. Check **App Store Connect → TestFlight** anyway — uploads sometimes succeed even when the CLI reports failure.
+
+### Common fixes
+
+| Cause | What to do |
+|-------|------------|
+| **Apple / Expo queue or 500** | Wait 30–60 minutes and submit again. |
+| **App Store agreements** | App Store Connect → **Business** / **Agreements** — accept any pending contracts. |
+| **API key permissions** | ASC key needs **App Manager** or **Admin**; key must include this app. |
+| **Stale Apple login cache** | `rm -rf ~/.app-store` then submit again (re-enter 2FA), or rely on API key only via `eas.json` `ascAppId`. |
+| **Upload size / Apple glitch** | Install [Transporter](https://apps.apple.com/app/transporter/id1450874784), download the `.ipa` from the [build artifact](https://expo.dev/accounts/kramerica/projects/license-plate/builds), upload manually. |
+| **Next build + submit in one step** | `npx eas-cli build --platform ios --profile production --auto-submit` |
+
+`eas.json` includes `ascAppId` and `appleTeamId` so submit skips re-creating the App Store Connect app and works better in CI.
