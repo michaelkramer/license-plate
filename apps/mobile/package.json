@@ -1,10 +1,10 @@
 {
   "name": "licenseplate-mobile",
   "version": "1.0.0",
-  "description": "",
+  "description": "Tracking license plates game",
   "main": "expo-router/entry",
   "license": "ISC",
-  "author": "",
+  "author": "Michael Kramer",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
