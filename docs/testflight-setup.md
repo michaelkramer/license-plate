@@ -41,7 +41,7 @@ Legacy alternative (not recommended): `EXPO_APPLE_APP_SPECIFIC_PASSWORD` plus Ap
 
 ## Branch protection
 
-See [ci-secrets.md](./ci-secrets.md). Version-sync commits use `[skip ci]` and change only `apps/mobile/app.json`, which is excluded from workflow path triggers via `paths-ignore`.
+See [ci-secrets.md](./ci-secrets.md). Version-sync commits use `[skip ci]` in the commit message so the workflow job is skipped and does not loop.
 
 ## CI behavior
 
