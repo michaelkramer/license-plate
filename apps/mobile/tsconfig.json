@@ -1,15 +1,17 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src"
+    "baseUrl": "./src",
+    "resolveJsonModule": true,
+    "ignoreDeprecations": "6.0"
   },
-  "extends": [
-    "expo/tsconfig.base"
-  ],
+  "extends": ["expo/tsconfig.base"],
   "jsx": "react-native",
   "include": [
     "global.d.ts",
+    "global.css.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "app.d.ts",
     "nativewind-env.d.ts"
   ]
 }

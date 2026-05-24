@@ -39,7 +39,10 @@ export class PlateController extends Controller {
 
   @Get("data")
   public async getPlatesData(): Promise<any> {
-    const dataPath = path.join(__dirname, "../assets/us-license-plates.json");
+    const dataPath = path.join(
+      __dirname,
+      "../assets/us-license-plates-union.json",
+    );
     if (!fs.existsSync(dataPath)) {
       return { error: "Data not found" };
     }

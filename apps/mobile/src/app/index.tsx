@@ -4,6 +4,9 @@ import StateList from "../component/StateList";
 import TrackedPlates from "../component/TrackedPlates";
 import { Footer } from "../component/layout/Footer";
 import { Header } from "../component/layout/Header";
+import { StateData } from "../interfaces/License-Plate";
+import { useScoreContext } from "../providers/score";
+import { states } from "../utilities/constants";
 
 export default function Page() {
   return (
@@ -16,71 +19,43 @@ export default function Page() {
 }
 
 function Content() {
-  const states = [
-    "Alabama",
-    "Alaska",
-    "Arizona",
-    "Arkansas",
-    "California",
-    "Colorado",
-    "Connecticut",
-    "Delaware",
-    "Florida",
-    "Georgia",
-    "Hawaii",
-    "Idaho",
-    "Illinois",
-    "Indiana",
-    "Iowa",
-    "Kansas",
-    "Kentucky",
-    "Louisiana",
-    "Maine",
-    "Maryland",
-    "Massachusetts",
-    "Michigan",
-    "Minnesota",
-    "Mississippi",
-    "Missouri",
-    "Montana",
-    "Nebraska",
-    "Nevada",
-    "New Hampshire",
-    "New Jersey",
-    "New Mexico",
-    "New York",
-    "North Carolina",
-    "North Dakota",
-    "Ohio",
-    "Oklahoma",
-    "Oregon",
-    "Pennsylvania",
-    "Rhode Island",
-    "South Carolina",
-    "South Dakota",
-    "Tennessee",
-    "Texas",
-    "Utah",
-    "Vermont",
-    "Virginia",
-    "Washington",
-    "West Virginia",
-    "Wisconsin",
-    "Wyoming",
-  ];
-  const [trackedPlates, setTrackedPlates] = React.useState([]);
-  const handlePlateClick = (state) => {
-    if (trackedPlates.includes(state)) {
-      setTrackedPlates((prev) => prev.filter((plate) => plate !== state));
+  const { score, trackedPlates, setTrackedPlates } = useScoreContext();
+
+  const handlePlateClick = (state: StateData) => {
+    if (!state) return;
+    if (
+      trackedPlates.find(
+        (plate) => plate.state.abbreviation === state.abbreviation,
+      )
+    ) {
+      // If the plate is already tracked, remove it
+      const existingPlates = trackedPlates.filter(
+        (plate) => plate.state.abbreviation !== state.abbreviation,
+      );
+      setTrackedPlates(existingPlates);
     } else {
-      setTrackedPlates((prev) => [...prev, state]);
+      // If the plate is not tracked, add it
+      setTrackedPlates([...trackedPlates, { state, plate_title: null }]);
     }
   };
   return (
     <View className="flex-1">
       <View className="px-4 md:px-6">
         <View className="flex flex-col items-center gap-4 text-center">
-          <TrackedPlates count={trackedPlates.length} />
+          <TrackedPlates count={score} />
+          {/*
+          // save for later use
+          <View>
+            {trackedPlates.map((plate, index) => (
+              <Text
+                key={plate.state.abbreviation}
+                className="text-gray-700 dark:text-gray-300 text-center"
+              >
+                {index + 1}. {plate.state.state} –{" "}
+                {plate.plate_title || "No plate title"}
+              </Text>
+            ))}
+          </View> */}
         </View>
       </View>
       <View className="px-4 md:px-6 mt-6 flex-1">

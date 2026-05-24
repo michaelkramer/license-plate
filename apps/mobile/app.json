@@ -2,10 +2,11 @@
   "expo": {
     "name": "licensePlate",
     "version": "1.0.0",
-    "slug": "licensePlate",
-    "schema": "licensePlate",
+    "slug": "licenseplate",
+    "scheme": "licenseplate",
     "userInterfaceStyle": "automatic",
     "orientation": "portrait",
+    "assetBundlePatterns": ["assets/**/*"],
     "web": {
       "output": "static"
     },
@@ -15,7 +16,11 @@
         {
           "origin": "https://n"
         }
-      ]
+      ],
+      "expo-asset",
+      "expo-image",
+      "expo-splash-screen",
+      "expo-status-bar"
     ]
   }
 }

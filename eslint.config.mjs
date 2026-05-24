@@ -30,6 +30,10 @@ export default tseslint.config(
   },
   eslintPluginPrettierRecommended,
   {
-    ignores: ["**/*.config.{js,mjs,cjs}", "**/*.{js,mjs,cjs}"],
+    ignores: [
+      "**/*.config.{js,mjs,cjs}",
+      "**/*.{js,mjs,cjs}",
+      "apps/mobile/src/bundledPlateImages.ts",
+    ],
   },
 );

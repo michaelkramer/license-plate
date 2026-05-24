@@ -1,36 +1,77 @@
+import { Image } from "expo-image";
 import React from "react";
-import { Image } from "react-native";
-import env from "../env";
+import { Text, View } from "react-native";
+import { LicensePlate } from "../interfaces/License-Plate";
+import { getPlateImageSource } from "../services/plates";
 
-const PLATE_HEIGHT = 250; // Default height for the plate image
-const PLATE_WIDTH = 500; // Default width for the plate image
+const PLATE_HEIGHT = 250;
+const PLATE_WIDTH = 500;
 
 export default function PlateImage({
   plate,
   scale = 1,
+  compact = false,
 }: {
-  plate: { state: string; plate_img: string };
-  scale: number;
+  plate: LicensePlate;
+  scale?: number;
+  compact?: boolean;
 }) {
   const width = PLATE_WIDTH * scale;
   const height = PLATE_HEIGHT * scale;
+  const marginTop = compact ? 0 : 8;
+  const [failed, setFailed] = React.useState(false);
+  const resolved = getPlateImageSource(plate);
 
-  const imagePath = `${env.API_URL}/plates/${plate.state}/${plate.plate_img}`;
+  React.useEffect(() => {
+    setFailed(false);
+  }, [plate.state, plate.plate_img]);
+
+  if (!resolved || failed) {
+    const hint = "Image unavailable";
+
+    return (
+      <View
+        style={{
+          width,
+          height,
+          borderRadius: 8,
+          borderColor: "#ccc",
+          borderWidth: 1,
+          marginTop,
+          backgroundColor: "#e5e7eb",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: compact ? 2 : 8,
+        }}
+      >
+        {!compact && (
+          <Text style={{ textAlign: "center", color: "#374151" }}>
+            {plate.plate_title}
+          </Text>
+        )}
+        {!compact && (
+          <Text style={{ textAlign: "center", color: "#6b7280", fontSize: 12 }}>
+            {hint}
+          </Text>
+        )}
+      </View>
+    );
+  }
 
   return (
     <Image
-      source={{
-        uri: imagePath,
-      }}
+      source={resolved}
+      onError={() => setFailed(true)}
       style={{
-        width: width,
-        height: height,
+        width,
+        height,
         borderRadius: 8,
         borderColor: "#ccc",
         borderWidth: 1,
-        marginTop: 8,
+        marginTop,
       }}
-      resizeMode="contain" // Changed to contain for better aspect ratio handling
+      contentFit="contain"
+      cachePolicy="memory-disk"
     />
   );
 }
