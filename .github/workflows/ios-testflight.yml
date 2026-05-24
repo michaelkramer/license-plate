@@ -19,6 +19,9 @@ jobs:
   build-and-submit:
     if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
+    # Uses GitHub Environment "preview" secrets (Settings → Environments → preview → Environment secrets).
+    # Do not use the Variables tab for tokens — use Environment secrets or repository secrets instead.
+    environment: preview
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
     defaults:
@@ -52,7 +55,7 @@ jobs:
       - name: Verify Expo authentication
         run: |
           if [ -z "$EXPO_TOKEN" ]; then
-            echo "::error::EXPO_TOKEN is missing or empty. Add a repository secret named exactly EXPO_TOKEN (Settings → Secrets and variables → Actions). Create a token at https://expo.dev/settings/access-tokens"
+            echo "::error::EXPO_TOKEN is missing. This workflow uses GitHub Environment 'preview'. Add EXPO_TOKEN under Settings → Environments → preview → Environment secrets (NOT Variables). Or use a repository secret on the Actions Secrets tab. See docs/ci-secrets.md"
             exit 1
           fi
           eas whoami
