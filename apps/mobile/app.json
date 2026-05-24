@@ -2,8 +2,21 @@
   "expo": {
     "name": "licensePlate",
     "version": "1.0.0",
-    "slug": "licenseplate",
+    "slug": "license-plate",
+    "owner": "kramerica",
     "scheme": "licenseplate",
+    "extra": {
+      "eas": {
+        "projectId": "1b025fdf-03f9-46ba-91b0-b3e5cffd3c0e"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.kramerica.licenseplate",
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.kramerica.licenseplate"
+    },
     "userInterfaceStyle": "automatic",
     "orientation": "portrait",
     "assetBundlePatterns": ["assets/**/*"],
