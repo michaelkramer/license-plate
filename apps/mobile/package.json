@@ -14,6 +14,9 @@
     "build:dev": "eas build --profile development",
     "build:preview": "eas build --profile preview",
     "build:prod": "eas build --profile production",
+    "build:ios:prod": "eas build --platform ios --profile production",
+    "submit:ios": "eas submit --platform ios --latest --profile production",
+    "version:sync": "eas build:version:sync --platform ios",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

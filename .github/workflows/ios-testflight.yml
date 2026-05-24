@@ -1,0 +1,81 @@
+name: iOS TestFlight
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/mobile/**"
+    paths-ignore:
+      - "apps/mobile/app.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ios-testflight-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-submit:
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT || github.token }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        working-directory: .
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          packager: npm
+
+      - name: Build iOS (production)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build --platform ios --profile production --non-interactive
+
+      - name: Submit to TestFlight
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_ASC_API_KEY_ID: ${{ secrets.EXPO_ASC_API_KEY_ID }}
+          EXPO_ASC_ISSUER_ID: ${{ secrets.EXPO_ASC_ISSUER_ID }}
+          EXPO_ASC_API_KEY: ${{ secrets.EXPO_ASC_API_KEY }}
+        run: eas submit --platform ios --latest --profile production --non-interactive
+
+      - name: Sync version from EAS
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: eas build:version:sync --platform ios --non-interactive
+
+      - name: Commit synced version
+        working-directory: .
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet apps/mobile/app.json; then
+            echo "No version changes to commit."
+            exit 0
+          fi
+          git add apps/mobile/app.json
+          git commit -m "chore(ios): sync EAS build version [skip ci]"
+          git push

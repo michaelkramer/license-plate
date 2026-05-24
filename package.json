@@ -8,6 +8,8 @@
     "ios": "npm run ios --workspace=licenseplate-mobile",
     "web": "npm run web --workspace=licenseplate-mobile",
     "deploy": "npm run deploy --workspace=licenseplate-mobile",
+    "build:ios:prod": "npm run build:ios:prod --workspace=licenseplate-mobile",
+    "submit:ios": "npm run submit:ios --workspace=licenseplate-mobile",
     "build:docs": "npm run build:docs --workspace=licenseplate-server",
     "server": "npm run dev --workspace=licenseplate-server",
     "sync:plates-data": "node scripts/sync-plates-data.js",

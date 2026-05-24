@@ -44,7 +44,7 @@ export function Header() {
                 className="text-center text-sm font-bold text-gray-900 dark:text-gray-50"
                 numberOfLines={1}
               >
-                Plate Tracker
+                Tracking Plate Game
               </Text>
             </Pressable>
           </Link>

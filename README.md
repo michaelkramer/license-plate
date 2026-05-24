@@ -45,4 +45,5 @@ Regenerate union data: `node scripts/limit-json.js`, then `npm run sync:plates-d
 ## Deploy
 
 - Web: `npm run deploy` (mobile workspace)
-- Native: `npx eas-cli build` — [Expo EAS](https://expo.dev/eas)
+- iOS TestFlight: pushes to `main` that change `apps/mobile/**` (except version-only `app.json` syncs) run [`.github/workflows/ios-testflight.yml`](.github/workflows/ios-testflight.yml). See [docs/testflight-setup.md](docs/testflight-setup.md) for Apple, Expo, and GitHub secrets.
+- Manual iOS build: `npm run build:ios:prod` then `npm run submit:ios` from repo root
