@@ -6,7 +6,17 @@ Add these under **Settings → Secrets and variables → Actions** for this repo
 
 | Secret | How to obtain |
 |--------|----------------|
-| `EXPO_TOKEN` | [expo.dev/settings/access-tokens](https://expo.dev/settings/access-tokens) |
+| `EXPO_TOKEN` | [expo.dev/settings/access-tokens](https://expo.dev/settings/access-tokens) — must be named **exactly** `EXPO_TOKEN` (case-sensitive) |
+
+### `EXPO_TOKEN` checklist
+
+1. Log in as **kramerica** (project owner in `apps/mobile/app.json`).
+2. Create an access token at [expo.dev/settings/access-tokens](https://expo.dev/settings/access-tokens) with permission to use EAS.
+3. In **this GitHub repo** (not only locally): **Settings → Secrets and variables → Actions → New repository secret**.
+4. Name: `EXPO_TOKEN` — Value: paste the token with no extra spaces or quotes.
+5. If the repo is under an organization, confirm the secret is visible to this repository (org secrets need repo access).
+
+The workflow fails with “An Expo user account is required” when this secret is missing, misnamed (e.g. `EXPO_ACCESS_TOKEN`), or empty. Re-run the workflow after saving the secret; you do not need to change the workflow file again.
 
 ## Recommended (App Store Connect API)
 

@@ -5,6 +5,7 @@
   "main": "expo-router/entry",
   "license": "ISC",
   "author": "Michael Kramer",
+  "email": "michaelrkramer@gmail.com",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
