@@ -70,7 +70,9 @@ See [ci-secrets.md](./ci-secrets.md). Version-sync commits use `[skip ci]` in th
 
 - Triggers on push to `main` when files under `apps/mobile/` change.
 - Skips when the commit message contains `[skip ci]` (version sync commits).
-- Builds iOS production on EAS, submits to TestFlight, syncs build number into `app.json`, and commits back to `main`.
+- **Job 1 `build`:** EAS iOS production build (outputs build ID).
+- **Job 2 `submit`:** TestFlight submit, version sync, commit to `main`. Re-run only this job if build succeeded but submit failed.
+- **Manual submit:** Actions → iOS TestFlight → Run workflow → optional **eas_build_id** (skips build, submits an existing build).
 
 ## TestFlight testers
 

@@ -1,6 +1,6 @@
 {
   "name": "licenseplate-mobile",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Tracking license plates game",
   "main": "expo-router/entry",
   "license": "ISC",

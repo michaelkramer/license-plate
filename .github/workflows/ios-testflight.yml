@@ -2,6 +2,11 @@ name: iOS TestFlight
 
 on:
   workflow_dispatch:
+    inputs:
+      eas_build_id:
+        description: "Optional EAS build ID to submit (skips build job)"
+        required: false
+        type: string
   push:
     branches:
       - main
@@ -16,14 +21,72 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-submit:
-    if: ${{ github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip ci]') }}
+  build:
+    if: ${{ (github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip ci]')) && github.event.inputs.eas_build_id == '' }}
     runs-on: ubuntu-latest
-    # Uses GitHub Environment "preview" secrets (Settings → Environments → preview → Environment secrets).
-    # Do not use the Variables tab for tokens — use Environment secrets or repository secrets instead.
     environment: preview
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    outputs:
+      build_id: ${{ steps.eas_build.outputs.build_id }}
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        working-directory: .
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          packager: npm
+
+      - name: Verify Expo authentication
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::EXPO_TOKEN is missing. See docs/ci-secrets.md"
+            exit 1
+          fi
+          eas whoami
+
+      - name: Build iOS (production)
+        id: eas_build
+        run: |
+          eas build --platform ios --profile production --non-interactive --json > "$RUNNER_TEMP/build.json"
+          BUILD_ID=$(jq -r 'if type == "array" then .[0].id else .id end' "$RUNNER_TEMP/build.json")
+          if [ -z "$BUILD_ID" ] || [ "$BUILD_ID" = "null" ]; then
+            echo "::error::Could not read build ID from eas build --json"
+            cat "$RUNNER_TEMP/build.json"
+            exit 1
+          fi
+          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
+          echo "EAS build ID: $BUILD_ID"
+
+  submit:
+    needs: build
+    if: >-
+      ${{ !cancelled() &&
+      (needs.build.result == 'success' ||
+        (needs.build.result == 'skipped' && github.event.inputs.eas_build_id != '')) &&
+      (github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip ci]')) }}
+    runs-on: ubuntu-latest
+    environment: preview
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS_BUILD_ID: ${{ github.event.inputs.eas_build_id || needs.build.outputs.build_id }}
     defaults:
       run:
         working-directory: apps/mobile
@@ -52,23 +115,20 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
           packager: npm
 
-      - name: Verify Expo authentication
+      - name: Resolve build ID
         run: |
-          if [ -z "$EXPO_TOKEN" ]; then
-            echo "::error::EXPO_TOKEN is missing. This workflow uses GitHub Environment 'preview'. Add EXPO_TOKEN under Settings → Environments → preview → Environment secrets (NOT Variables). Or use a repository secret on the Actions Secrets tab. See docs/ci-secrets.md"
+          if [ -z "$EAS_BUILD_ID" ]; then
+            echo "::error::No EAS build ID. Run the build job first, or pass eas_build_id when using workflow_dispatch."
             exit 1
           fi
-          eas whoami
-
-      - name: Build iOS (production)
-        run: eas build --platform ios --profile production --non-interactive
+          echo "Submitting build: $EAS_BUILD_ID"
 
       - name: Submit to TestFlight
         env:
           EXPO_ASC_API_KEY_ID: ${{ secrets.EXPO_ASC_API_KEY_ID }}
           EXPO_ASC_ISSUER_ID: ${{ secrets.EXPO_ASC_ISSUER_ID }}
           EXPO_ASC_API_KEY: ${{ secrets.EXPO_ASC_API_KEY }}
-        run: eas submit --platform ios --latest --profile production --non-interactive
+        run: eas submit --platform ios --id "$EAS_BUILD_ID" --profile production --non-interactive
 
       - name: Sync version from EAS
         run: eas build:version:sync --platform ios --non-interactive
