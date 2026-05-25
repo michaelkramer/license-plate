@@ -1,70 +1,145 @@
 import React, { createContext } from "react";
+import { StoredGame } from "../interfaces/Game";
 import { TrackedPlate } from "../interfaces/License-Plate";
 import {
-  loadTrackedPlates,
-  saveTrackedPlates,
-} from "../services/trackedPlatesStorage";
+  addActiveGame,
+  completeActiveGameInList,
+  deleteGameById,
+  getActiveGame,
+  getCompletedGames,
+  getTrackedPlatesFromGame,
+  loadGames,
+  saveGames,
+  updateActiveGamePlates,
+} from "../services/gameStorage";
 
 interface ScoreContextType {
   score: number;
-  setScore: (score: number) => void;
   highScore: number;
   setHighScore: (highScore: number) => void;
   lastUpdated: Date;
-  setLastUpdated: (date: Date) => void;
   trackedPlates: TrackedPlate[];
   setTrackedPlates: (plates: TrackedPlate[]) => void;
-  resetTracking: () => void;
+  activeGame: StoredGame | null;
+  completedGames: StoredGame[];
+  plateDisplaySeed: number;
   isHydrated: boolean;
+  hasActiveGame: boolean;
+  startGame: () => void;
+  ensureActiveGame: () => void;
+  completeGame: () => void;
+  deleteGame: (gameId: string) => void;
 }
 
 export const ScoreContext = createContext<ScoreContextType | null>(null);
 
 export function ScoreProvider({ children }: { children: React.ReactNode }) {
-  const [score, setScore] = React.useState(0);
+  const [games, setGames] = React.useState<StoredGame[]>([]);
   const [highScore, setHighScore] = React.useState(0);
   const [lastUpdated, setLastUpdated] = React.useState(new Date());
-  const [trackedPlates, setTrackedPlates] = React.useState<TrackedPlate[]>([]);
+  const [plateDisplaySeed, setPlateDisplaySeed] = React.useState(1);
   const [isHydrated, setIsHydrated] = React.useState(false);
 
+  const activeGame = React.useMemo(() => getActiveGame(games), [games]);
+  const completedGames = React.useMemo(() => getCompletedGames(games), [games]);
+  const trackedPlates = React.useMemo(
+    () => getTrackedPlatesFromGame(activeGame),
+    [activeGame],
+  );
+  const score = trackedPlates.length;
+  const hasActiveGame = activeGame !== null;
+
+  const mutateGames = React.useCallback(
+    (updater: (current: StoredGame[]) => StoredGame[]) => {
+      setGames((current) => {
+        const next = updater(current);
+        saveGames(next);
+        setLastUpdated(new Date());
+        return next;
+      });
+    },
+    [],
+  );
+
   React.useEffect(() => {
-    loadTrackedPlates().then((plates) => {
-      setTrackedPlates(plates);
+    loadGames().then((loaded) => {
+      setGames(loaded);
+      const active = getActiveGame(loaded);
+      if (active) {
+        setPlateDisplaySeed(active.plateDisplaySeed);
+      }
       setIsHydrated(true);
     });
   }, []);
 
-  React.useEffect(() => {
-    setScore(trackedPlates.length);
-  }, [trackedPlates]);
+  const setTrackedPlates = React.useCallback(
+    (plates: TrackedPlate[]) => {
+      mutateGames((current) => {
+        let working = current;
+        if (!getActiveGame(working)) {
+          working = addActiveGame(working, plateDisplaySeed);
+        }
+        return updateActiveGamePlates(working, plates);
+      });
+    },
+    [mutateGames, plateDisplaySeed],
+  );
 
-  React.useEffect(() => {
-    if (!isHydrated) {
-      return;
-    }
-    saveTrackedPlates(trackedPlates);
-    setLastUpdated(new Date());
-  }, [trackedPlates, isHydrated]);
+  const startGame = React.useCallback(() => {
+    mutateGames((current) => {
+      if (getActiveGame(current)) {
+        return current;
+      }
+      return addActiveGame(current, plateDisplaySeed);
+    });
+  }, [mutateGames, plateDisplaySeed]);
 
-  const resetTracking = React.useCallback(() => {
-    setTrackedPlates([]);
-    setScore(0);
-    setLastUpdated(new Date());
-  }, []);
+  const ensureActiveGame = React.useCallback(() => {
+    mutateGames((current) => {
+      if (getActiveGame(current)) {
+        return current;
+      }
+      return addActiveGame(current, plateDisplaySeed);
+    });
+  }, [mutateGames, plateDisplaySeed]);
+
+  const completeGame = React.useCallback(() => {
+    mutateGames((current) => {
+      const active = getActiveGame(current);
+      if (!active) {
+        return current;
+      }
+      const { games: nextGames, nextSeed } = completeActiveGameInList(current);
+      setPlateDisplaySeed(nextSeed);
+      return nextGames;
+    });
+  }, [mutateGames]);
+
+  const deleteGame = React.useCallback(
+    (gameId: string) => {
+      mutateGames((current) => deleteGameById(current, gameId));
+    },
+    [mutateGames],
+  );
 
   return (
     <ScoreContext.Provider
       value={{
         score,
-        setScore,
         highScore,
         setHighScore,
         lastUpdated,
-        setLastUpdated,
         trackedPlates,
         setTrackedPlates,
-        resetTracking,
+        activeGame,
+        completedGames,
+        plateDisplaySeed,
         isHydrated,
+        hasActiveGame,
+        startGame,
+        ensureActiveGame,
+        completeGame,
+        deleteGame,
       }}
     >
       {children}

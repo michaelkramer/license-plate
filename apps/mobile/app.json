@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "licensePlate",
+    "name": "Tracking Plate Game",
     "version": "1.0.0",
     "slug": "license-plate",
     "owner": "kramerica",
@@ -22,7 +22,7 @@
     },
     "userInterfaceStyle": "automatic",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/license-plate.png",
     "assetBundlePatterns": [
       "assets/**/*"
     ],
@@ -41,10 +41,10 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/license-plate.png",
+          "imageWidth": 280,
           "resizeMode": "contain",
-          "backgroundColor": "#2563eb"
+          "backgroundColor": "#000000"
         }
       ],
       "expo-status-bar"

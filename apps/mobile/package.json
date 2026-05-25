@@ -19,7 +19,8 @@
     "submit:ios": "eas submit --platform ios --latest --profile production",
     "version:sync": "eas build:version:sync --platform ios",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "doctor": "expo-doctor"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
@@ -28,6 +29,7 @@
     "expo-asset": "~56.0.14",
     "expo-camera": "~56.0.7",
     "expo-constants": "~56.0.15",
+    "expo-doctor": "^1.18.19",
     "expo-image": "~56.0.9",
     "expo-linking": "~56.0.11",
     "expo-router": "~56.2.6",

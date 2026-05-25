@@ -16,7 +16,8 @@
     "build:bundled-plates": "node scripts/build-bundled-plates.js",
     "test:asc": "node scripts/test-asc-api-key.mjs",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "doctor": "npm run doctor --workspace=licenseplate-mobile"
   },
   "workspaces": [
     "apps/*"
@@ -35,5 +36,8 @@
     "prettier": "3.5.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.30.0"
+  },
+  "dependencies": {
+    "expo-doctor": "^1.18.19"
   }
 }

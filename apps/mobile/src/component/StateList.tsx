@@ -25,10 +25,12 @@ function getTrackedTitle(
 export default function StateList({
   states,
   trackedPlates,
+  plateDisplaySeed,
   handlePlateClick,
 }: {
   states: StateData[];
   trackedPlates: TrackedPlate[];
+  plateDisplaySeed: number;
   handlePlateClick: (state: StateData) => void;
 }) {
   return (
@@ -39,6 +41,7 @@ export default function StateList({
           const displayPlate = getDisplayPlateForState(
             state.abbreviation,
             getTrackedTitle(trackedPlates, state),
+            plateDisplaySeed,
           );
 
           return (
@@ -55,7 +58,10 @@ export default function StateList({
                 {state.state}
               </Text>
               {displayPlate && (
-                <View className="mr-2">
+                <View
+                  key={`${state.abbreviation}-${plateDisplaySeed}-${displayPlate.plate_img}`}
+                  className="mr-2"
+                >
                   <PlateImage plate={displayPlate} scale={0.15} compact />
                 </View>
               )}

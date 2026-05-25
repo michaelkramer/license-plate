@@ -13,16 +13,17 @@ export function getBundledPlatesByState(stateAbbr: string): LicensePlate[] {
   return manifest.states[stateAbbr.toUpperCase()] ?? [];
 }
 
-/** Deterministic “sample” plate per state (stable across re-renders). */
+/** Deterministic sample plate per state; changes when displaySeed changes (e.g. new game). */
 export function getSampleBundledPlateForState(
   stateAbbr: string,
+  displaySeed = 1,
 ): LicensePlate | null {
   const plates = getBundledPlatesByState(stateAbbr);
   if (plates.length === 0) {
     return null;
   }
-  const key = stateAbbr.toUpperCase();
-  let index = 0;
+  const key = `${displaySeed}:${stateAbbr.toUpperCase()}`;
+  let index = displaySeed;
   for (let i = 0; i < key.length; i += 1) {
     index = (index + key.charCodeAt(i) * (i + 1)) % plates.length;
   }
@@ -33,6 +34,7 @@ export function getSampleBundledPlateForState(
 export function getDisplayPlateForState(
   stateAbbr: string,
   trackedTitle?: string | null,
+  displaySeed = 1,
 ): LicensePlate | null {
   const plates = getBundledPlatesByState(stateAbbr);
   if (plates.length === 0) {
@@ -44,7 +46,7 @@ export function getDisplayPlateForState(
       return match;
     }
   }
-  return getSampleBundledPlateForState(stateAbbr);
+  return getSampleBundledPlateForState(stateAbbr, displaySeed);
 }
 
 export async function getAllBundledPlates(): Promise<LicensePlate[]> {

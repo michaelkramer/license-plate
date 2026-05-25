@@ -1,3 +1,6 @@
+/**
+ * @deprecated Games are stored via gameStorage.ts. Legacy key is migrated on first loadGames().
+ */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TrackedPlate } from "../interfaces/License-Plate";
 import { states } from "../utilities/constants";
@@ -9,6 +12,7 @@ type StoredTrackedPlate = {
   plate_title: string | null;
 };
 
+/** @deprecated Use gameStorage.loadGames() */
 export async function loadTrackedPlates(): Promise<TrackedPlate[]> {
   try {
     const raw = await AsyncStorage.getItem(STORAGE_KEY);
@@ -41,6 +45,7 @@ export async function loadTrackedPlates(): Promise<TrackedPlate[]> {
   }
 }
 
+/** @deprecated Use gameStorage.saveGames() */
 export async function saveTrackedPlates(plates: TrackedPlate[]): Promise<void> {
   const payload: StoredTrackedPlate[] = plates.map((plate) => ({
     abbreviation: plate.state.abbreviation,

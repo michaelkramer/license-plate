@@ -24,7 +24,7 @@ export default function PlateImage({
 
   React.useEffect(() => {
     setFailed(false);
-  }, [plate.state, plate.plate_img]);
+  }, [plate.state, plate.plate_img, plate.plate_title]);
 
   if (!resolved || failed) {
     const hint = "Image unavailable";
