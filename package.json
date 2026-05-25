@@ -14,6 +14,7 @@
     "server": "npm run dev --workspace=licenseplate-server",
     "sync:plates-data": "node scripts/sync-plates-data.js",
     "build:bundled-plates": "node scripts/build-bundled-plates.js",
+    "test:asc": "node scripts/test-asc-api-key.mjs",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

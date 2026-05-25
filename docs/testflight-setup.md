@@ -133,3 +133,27 @@ The CLI message is generic. Find the real error:
 | **Next build + submit in one step** | `npx eas-cli build --platform ios --profile production --auto-submit` |
 
 `eas.json` includes `ascAppId` and `appleTeamId` so submit skips re-creating the App Store Connect app and works better in CI.
+
+## Test App Store Connect API auth (401 debugging)
+
+EAS Submit uses the same JWT as Apple’s REST API. Test locally **before** `npm run submit:ios`:
+
+```sh
+# From repo root — uses Node only (no pip)
+npm run test:asc
+# or: node scripts/test-asc-api-key.mjs
+```
+
+Loads [`.env`](../.env) automatically. Prefer `ASC_KEY_PATH` to your `.p8` file.
+
+**Homebrew `pip3` broken on your Mac?** That is a known Python + macOS `libexpat` mismatch; use the Node script above instead of `scripts/test-asc-api-key.py`. Optional pip fix: `DYLD_LIBRARY_PATH=/opt/homebrew/opt/expat/lib pip3.12 install 'pyjwt[crypto]'` (Python 3.12 was also installed via `brew install python@3.12`).
+
+**Success:** `GET /v1/apps → HTTP 200` and `GET /v1/apps/<id> → HTTP 200`.
+
+**401 on both:** wrong Issuer ID, wrong Key ID, bad/revoked `.p8`, or `EXPO_ASC_API_KEY` base64 is wrong (re-encode: `base64 -i AuthKey.p8 | tr -d '\n'`).
+
+**200 on /apps but 404 on /apps/<id>:** `ASC_APP_ID` / `ascAppId` in `eas.json` does not match the app (your error used `6919295469` — confirm in App Store Connect).
+
+**200 on /apps but 403 on /apps/<id>:** key role too low — use **Admin** or **App Manager**.
+
+After the script passes, re-upload the same `.p8` on [expo.dev](https://expo.dev) → project → Credentials, then run `npm run submit:ios` again.
