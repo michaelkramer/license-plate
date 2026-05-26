@@ -128,10 +128,11 @@ jobs:
           EXPO_ASC_API_KEY_ID: ${{ secrets.EXPO_ASC_API_KEY_ID }}
           EXPO_ASC_ISSUER_ID: ${{ secrets.EXPO_ASC_ISSUER_ID }}
           EXPO_ASC_API_KEY: ${{ secrets.EXPO_ASC_API_KEY }}
+          EXPO_ADMOB_MAIN_BANNER_ID: ${{ secrets.EXPO_ADMOB_MAIN_BANNER_ID }}
         run: eas submit --platform ios --id "$EAS_BUILD_ID" --profile production --non-interactive
 
       - name: Sync version from EAS
-        run: eas build:version:sync --platform ios --non-interactive
+        run: eas build:version:sync --platform ios
 
       - name: Commit synced version
         working-directory: .
